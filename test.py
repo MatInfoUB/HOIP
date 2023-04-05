@@ -1,8 +1,10 @@
 import argparse
 from hoip.load_data import load_data
-import hoip
+import os
 from tensorflow.keras.models import load_model
 from sklearn.metrics import r2_score
+import matplotlib.pyplot as plt
+import pandas as pd
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--output", default='relative energy1', help='Output Parameter')
@@ -19,11 +21,24 @@ def main():
 
     X_train, X_test, one_hots_train, \
     one_hots_test, y_train, y_test = load_data(options)
+    res_dir = os.path.join('Results', options.output)
+    models = [m for m in os.listdir(res_dir) if 'h5' in m]
+    model = load_model(os.path.join(res_dir, models[1]))
 
-    model = load_model('Results/relative energy1/model_09_29_2021.h5')
+    y_predict = model.predict([X_train, one_hots_train])
+    print('Training R2 is: ', r2_score(y_train, y_predict))
+    residual = y_train - y_predict.reshape(len(y_train))
+    fig, ax = plt.subplots()
+    ax.scatter(y_train, residual, c='cyan')
 
     y_predict = model.predict([X_test, one_hots_test])
     print('Testing R2 is: ', r2_score(y_test, y_predict))
+    residual = y_test - y_predict.reshape(len(y_test))
+    ax.scatter(y_test, residual, c='b')
+    ax.set_ylim([-0.25, 0.45])
+    plt.show()
+
+    cluster = pd.read_excel('Results/cluster_member.xlsx')
 
 
 if __name__ == '__main__':
