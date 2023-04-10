@@ -22,9 +22,8 @@ def main():
 
     X_train, X_test, one_hots_train, \
     one_hots_test, y_train, y_test, inds = load_data(options, return_inds=True)
-    res_dir = os.path.join('Results', options.output)
-    models = [m for m in os.listdir(res_dir) if 'h5' in m]
-    model = load_model(os.path.join(res_dir, models[1]))
+    model_name = [m for m in os.listdir('Results') if 'h5' in m][0]
+    model = load_model(os.path.join('Results', model_name))
 
     cluster = pd.read_excel('Results/cluster_member.xlsx')
 
