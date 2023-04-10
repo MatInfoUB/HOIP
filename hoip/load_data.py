@@ -3,11 +3,12 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 
 
-def load_data(options):
+def load_data(options, return_inds=False):
 
     data = pd.read_csv('Data/HOIP_dataframe.csv')
     descriptor_list = pd.read_csv('Data/descriptors_2.txt')
     descriptor_list = descriptor_list['Descriptors']
+    data = data.set_index(data.file)
 
     # seperating the scalar
     X = data[descriptor_list[:-7]]
@@ -20,7 +21,13 @@ def load_data(options):
     y = data[options.output]
 
     # Train test split
-    X_train, X_test, one_hots_train, one_hots_test, y_train, y_test = \
-        train_test_split(X, one_hots, y, random_state=42)
+    ind_train, ind_test = train_test_split(range(1334), random_state=42)
+    X_train, X_test = X[ind_train], X[ind_test]
+    ind_train, ind_test = train_test_split(data['file'].tolist(), random_state=42)
+    y_train, y_test, one_hots_train, one_hots_test= y[ind_train], y[ind_test], one_hots.loc[ind_train], one_hots.loc[ind_test]
 
-    return X_train, X_test, one_hots_train, one_hots_test, y_train, y_test
+    if return_inds:
+        return X_train, X_test, one_hots_train, one_hots_test, y_train, y_test, data['file'].tolist()
+
+    else:
+        return X_train, X_test, one_hots_train, one_hots_test, y_train, y_test
