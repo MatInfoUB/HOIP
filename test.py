@@ -9,7 +9,7 @@ import pandas as pd
 import seaborn as sns
 sns.set_context('talk')
 parser = argparse.ArgumentParser()
-parser.add_argument("--output", default='relative energy1', help='Output Parameter')
+parser.add_argument("--output", default='dielectric constant, electronic', help='Output Parameter')
 
 
 options = parser.parse_args()
@@ -32,9 +32,11 @@ def main():
         cluster_col[s] = col
     data['Cluster'] = cluster_col
 
+    print('NN Results:')
     # training dataset
     y_predict = model.predict([X_train, one_hots_train])
-    print('Training R2 is: ', r2_score(y_train, y_predict))
+    print('Train R2: ', r2_score(y_train, y_predict), 'Train MSE: ', mean_squared_error(y_train, y_predict),
+          'Train MAE: ', mean_absolute_error(y_train, y_predict))
     residual = y_train - y_predict.reshape(len(y_train))
     fig, ax = plt.subplots(2, figsize=[14.4,  7.3])
     ax[0].scatter(y_train, residual, c='cyan', label='training set')
@@ -58,7 +60,8 @@ def main():
 
     # testing dataset
     y_predict = model.predict([X_test, one_hots_test])
-    print('Testing R2 is: ', r2_score(y_test, y_predict))
+    print('Test R2: ', r2_score(y_test, y_predict), 'Test MSE: ', mean_squared_error(y_test, y_predict),
+          'Test MAE: ', mean_absolute_error(y_test, y_predict))
     residual = y_test - y_predict.reshape(len(y_test))
     ax[0].scatter(y_test, residual, c='b', label='test set')
 
@@ -90,6 +93,15 @@ def main():
                                            'test_results_' + options.output + '.csv'), header=None)
     test_result.columns = ['Id', 'Observed', 'Predicted']
     test_result = test_result.set_index('Id')
+
+    print('CGCNN Results')
+    print('Train R2: ', r2_score(train_result['Observed'], train_result['Predicted']),
+          'Train MSE: ', mean_squared_error(train_result['Observed'], train_result['Predicted']),
+          'Train MAE: ', mean_absolute_error(train_result['Observed'], train_result['Predicted']))
+
+    print('Test R2: ', r2_score(test_result['Observed'], test_result['Predicted']),
+          'Test MSE: ', mean_squared_error(test_result['Observed'], test_result['Predicted']),
+          'Test MAE: ', mean_absolute_error(test_result['Observed'], test_result['Predicted']))
 
     train_result['Cluster'] = data.loc[train_result.index]['Cluster']
     cgcnn_train_r2_scores = train_result.groupby('Cluster').apply(lambda row:
