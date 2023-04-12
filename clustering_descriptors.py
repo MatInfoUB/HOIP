@@ -7,7 +7,7 @@ import seaborn as sns
 import umap
 
 # Data set
-df1 = pd.read_csv('Data/2021_09_21_HOIP_dataframe_for_Arpan_and_Ruhil.csv',
+df1 = pd.read_csv('Data/HOIP_dataframe.csv',
                   usecols=lambda x: 'Unnamed' not in x,
                   header=0
                  )
@@ -34,12 +34,12 @@ random_state = 2424
 
 mapper = umap.UMAP(min_dist=min_dist, n_neighbors=n_neighbors,
                    n_components=n_components, random_state=random_state, output_dens=True)
-embedding = mapper.fit_transform(scaled_data)
+mapper.fit(scaled_data)
 
 # Clustering on UMAP embedding
 clusterer = hdbscan.HDBSCAN(min_samples=10,
                             min_cluster_size=50,
                            )
 
-labels = clusterer.fit_predict(embedding[0])
+labels = clusterer.fit_predict(mapper.embedding_)
 
