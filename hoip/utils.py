@@ -71,9 +71,12 @@ def cluster_descriptors():
 
     # Clustering on UMAP embedding
     clusterer = hdbscan.HDBSCAN(min_samples=10,
-                                min_cluster_size=50,
+                                min_cluster_size=30,
                                 )
 
     labels = clusterer.fit_predict(mapper.embedding_)
+    fig, ax = plt.subplots(figsize=[8.65, 7.28])
+    clusterer.condensed_tree_.plot(axis=ax, label_clusters=True, select_clusters=True)
+    plt.show()
 
     return labels

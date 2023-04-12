@@ -168,7 +168,7 @@ def main():
                                      cgcnn_org_r2_scores_train, cgcnn_org_r2_scores_train], axis=1)
         r2_org_scores_table.columns = ['HFS NN test', 'HFS NN train', 'CGCNN test', 'CGCNN train']
         fig, ax = plt.subplots(figsize=[8.65, 7.28])
-        sns.heatmap(r2_scores_table, annot=True, ax=ax)
+        sns.heatmap(r2_org_scores_table, annot=True, ax=ax)
         ax.set_title('Formation Energy')
         plt.savefig('Figures/' + options.output + '_organic.png', bbox_inches='tight')
         plt.show()
