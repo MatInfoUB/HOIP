@@ -8,13 +8,16 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 sns.set_context('talk')
+
 parser = argparse.ArgumentParser()
-parser.add_argument("--output", default='dielectric constant, electronic', help='Output Parameter')
+parser.add_argument("--output", default='relative_energy1', help='Output Parameter')
 
 options = parser.parse_args()
 
 
 def main():
+
+    options.output = ' '.join(options.output.split('_'))
 
     X_train, X_test, one_hots_train, \
     one_hots_test, y_train, y_test, data = load_data(options, return_data=True)
