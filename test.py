@@ -11,7 +11,6 @@ sns.set_context('talk')
 parser = argparse.ArgumentParser()
 parser.add_argument("--output", default='dielectric constant, electronic', help='Output Parameter')
 
-
 options = parser.parse_args()
 
 
