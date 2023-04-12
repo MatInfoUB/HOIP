@@ -1,6 +1,6 @@
 import argparse
 import numpy as np
-from hoip.load_data import load_data
+from hoip.utils import *
 import os
 from tensorflow.keras.models import load_model
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
@@ -26,13 +26,13 @@ def main():
 
     x = np.linspace(data[options.output].min(), data[options.output].max(), 100)
 
-    cluster = pd.read_excel('Results/cluster_member.xlsx')
-    cluster_col = pd.Series(np.zeros(len(data), dtype=int), index=data.index)
-    for col in cluster.columns:
-        s = cluster[col].isna()
-        s = cluster[col][~s].astype(int)
-        cluster_col[s] = col
-    data['Cluster'] = cluster_col
+    # cluster = pd.read_excel('Results/cluster_member.xlsx')
+    # cluster_col = pd.Series(np.zeros(len(data), dtype=int), index=data.index)
+    # for col in cluster.columns:
+    #     s = cluster[col].isna()
+    #     s = cluster[col][~s].astype(int)
+    #     cluster_col[s] = col
+    data['Cluster'] = cluster_descriptors()
 
     print('NN Results:')
     # training dataset
