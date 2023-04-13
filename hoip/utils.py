@@ -80,3 +80,19 @@ def cluster_descriptors():
     plt.show()
 
     return labels
+
+
+def calculate_order(df, col=None):
+
+    order_full = []
+    file_list = []
+    for unique_label in df.label.unique():
+        temp = df[df['label'] == unique_label].sort_values(col, axis=0).reset_index()
+        file_list += temp['file'].tolist()
+        order_full += temp.index.tolist()
+
+    order = pd.DataFrame({'file': file_list, 'order': order_full})
+    order = order.sort_values(by='file')
+
+    return order
+

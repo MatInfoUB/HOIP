@@ -31,3 +31,20 @@ def load_data(options, return_data=False):
 
     else:
         return X_train, X_test, one_hots_train, one_hots_test, y_train, y_test
+
+
+def calculate_order(df, col=None):
+
+    if 'file' in df.columns:
+        df = df.drop(columns='file')
+    order_full = []
+    file_list = []
+    for unique_label in df.label.unique():
+        temp = df[df['label'] == unique_label].sort_values(col).reset_index()
+        file_list += temp['file'].tolist()
+        order_full += temp.index.tolist()
+
+    order = pd.DataFrame({'file': file_list, 'order': order_full})
+    order = order.sort_values(by='file')
+
+    return order

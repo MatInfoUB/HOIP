@@ -1,6 +1,6 @@
 import argparse
 import numpy as np
-from hoip.utils import *
+from hoip.load_data import *
 import os
 from tensorflow.keras.models import load_model
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
@@ -24,6 +24,7 @@ def main():
     model_name = [m for m in os.listdir('Results') if 'h5' in m and options.output in m][0]
     model = load_model(os.path.join('Results', model_name))
 
+    print('label' in data.columns)
     x = np.linspace(data[options.output].min(), data[options.output].max(), 100)
 
     # cluster = pd.read_excel('Results/cluster_member.xlsx')
@@ -32,11 +33,22 @@ def main():
     #     s = cluster[col].isna()
     #     s = cluster[col][~s].astype(int)
     #     cluster_col[s] = col
-    data['Cluster'] = cluster_descriptors()
+    try:
+        data['Cluster'] = cluster_descriptors()
+    except:
+        cluster = pd.read_csv('Results/cluster_member.csv')
+        data['Cluster'] = cluster['Cluster']
 
     print('NN Results:')
+
+    # Observed Order
+    if options.output == 'relative energy1':
+        observed_order = calculate_order(data, 'relative energy1')
+        predicted_order = pd.Series(np.zeros(len(data), dtype=int), index=data.index, name='relative energy1')
     # training dataset
     y_predict = model.predict([X_train, one_hots_train])
+    if options.output == 'relative energy1':
+        predicted_order.loc[y_train.index] = y_predict.reshape(len(y_train))
     print('Train R2: ', r2_score(y_train, y_predict), 'Train MSE: ', mean_squared_error(y_train, y_predict),
           'Train MAE: ', mean_absolute_error(y_train, y_predict))
     residual = y_train - y_predict.reshape(len(y_train))
@@ -67,6 +79,11 @@ def main():
     residual = y_test - y_predict.reshape(len(y_test))
     ax[0].scatter(y_test, residual, c='b', label='test set')
 
+    if options.output == 'relative energy1':
+        predicted_order.loc[y_test.index] = y_predict.reshape(len(y_test))
+        temp_df = pd.concat([predicted_order, data['label']], axis=1)
+        predicted_order = calculate_order(temp_df, 'relative energy1')
+        cm = pd.crosstab(observed_order['order'], predicted_order['order'])
     # calculate equation for trendline
     z = np.polyfit(y_test, residual, 1)
     p = np.poly1d(z)
@@ -164,6 +181,11 @@ def main():
     plt.show()
 
     if options.output == 'relative energy1':
+        fig, ax = plt.subplots(figsize=[8.65, 7.28])
+        sns.heatmap(cm, annot=True, ax=ax, annot_kws={"fontsize":8})
+        plt.show()
+
+
         r2_org_scores_table = pd.concat([nn_org_r2_scores_train, nn_org_r2_scores_test,
                                      cgcnn_org_r2_scores_train, cgcnn_org_r2_scores_train], axis=1)
         r2_org_scores_table.columns = ['HFS NN test', 'HFS NN train', 'CGCNN test', 'CGCNN train']
