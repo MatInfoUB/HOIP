@@ -7,6 +7,7 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 import umap
 
+sns.set_context('talk')
 
 def load_data(options, return_data=False):
 
@@ -39,8 +40,9 @@ def load_data(options, return_data=False):
 
 
 def cluster_descriptors():
+
     # Data set
-    df1 = pd.read_csv('Data/HOIP_dataframe.csv',
+    df1 = pd.read_csv('Data/2021_09_21_HOIP_dataframe_for_clustering.csv',
                       usecols=lambda x: 'Unnamed' not in x,
                       header=0
                       )
@@ -70,13 +72,13 @@ def cluster_descriptors():
     mapper.fit(scaled_data)
 
     # Clustering on UMAP embedding
-    clusterer = hdbscan.HDBSCAN(min_samples=10,
-                                min_cluster_size=30,
+    clusterer_2 = hdbscan.HDBSCAN(min_samples=15,
+                                min_cluster_size=16,
                                 )
 
-    labels = clusterer.fit_predict(mapper.embedding_)
+    labels = clusterer_2.fit_predict(mapper.embedding_)
     fig, ax = plt.subplots(figsize=[8.65, 7.28])
-    clusterer.condensed_tree_.plot(axis=ax, label_clusters=True, select_clusters=True)
+    clusterer_2.condensed_tree_.plot(axis=ax, label_clusters=True, select_clusters=True)
     plt.show()
 
     return labels
@@ -84,6 +86,8 @@ def cluster_descriptors():
 
 def calculate_order(df, col=None):
 
+    if 'file' in df.columns:
+        df = df.drop(columns='file')
     order_full = []
     file_list = []
     for unique_label in df.label.unique():

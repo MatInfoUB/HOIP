@@ -1,6 +1,6 @@
 import argparse
 import numpy as np
-from hoip.load_data import *
+from hoip.utils import *
 import os
 from tensorflow.keras.models import load_model
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
@@ -24,7 +24,6 @@ def main():
     model_name = [m for m in os.listdir('Results') if 'h5' in m and options.output in m][0]
     model = load_model(os.path.join('Results', model_name))
 
-    print('label' in data.columns)
     x = np.linspace(data[options.output].min(), data[options.output].max(), 100)
 
     # cluster = pd.read_excel('Results/cluster_member.xlsx')
@@ -43,7 +42,7 @@ def main():
 
     # Observed Order
     if options.output == 'relative energy1':
-        observed_order = calculate_order(data, 'relative energy1')
+        observed_order = calculate_order(data, 'relative energy2')
         predicted_order = pd.Series(np.zeros(len(data), dtype=int), index=data.index, name='relative energy1')
     # training dataset
     y_predict = model.predict([X_train, one_hots_train])
@@ -83,7 +82,10 @@ def main():
         predicted_order.loc[y_test.index] = y_predict.reshape(len(y_test))
         temp_df = pd.concat([predicted_order, data['label']], axis=1)
         predicted_order = calculate_order(temp_df, 'relative energy1')
-        cm = pd.crosstab(observed_order['order'], predicted_order['order'])
+        order = pd.DataFrame({'Actual Ordering': observed_order['order'].values,
+                              'Predicted Ordering': predicted_order['order'].values},
+                             index=observed_order.file)
+        cm = pd.crosstab(order['Actual Ordering'], order['Predicted Ordering'])
     # calculate equation for trendline
     z = np.polyfit(y_test, residual, 1)
     p = np.poly1d(z)
@@ -182,9 +184,9 @@ def main():
 
     if options.output == 'relative energy1':
         fig, ax = plt.subplots(figsize=[8.65, 7.28])
-        sns.heatmap(cm, annot=True, ax=ax, annot_kws={"fontsize":8})
+        sns.heatmap(cm, annot=True, ax=ax, annot_kws={"fontsize":10})
+        plt.savefig('Figures/' + options.output + '_ordering.png', bbox_inches='tight')
         plt.show()
-
 
         r2_org_scores_table = pd.concat([nn_org_r2_scores_train, nn_org_r2_scores_test,
                                      cgcnn_org_r2_scores_train, cgcnn_org_r2_scores_train], axis=1)
