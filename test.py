@@ -62,6 +62,8 @@ def main():
     residual = pd.DataFrame({'Observed': y_train, 'Predicted':
         y_predict.reshape(len(y_train))}, index=y_train.index)
 
+    residual_total = residual.copy()
+    residual_total['Split'] = 'train'
     residual['Cluster'] = data.loc[residual.index]['Cluster']
     nn_train_r2_scores = residual.groupby('Cluster').apply(lambda row:
                                                   r2_score(row['Observed'], row['Predicted']))
@@ -95,6 +97,13 @@ def main():
 
     residual = pd.DataFrame({'Observed': y_test, 'Predicted':
         y_predict.reshape(len(y_test))}, index=y_test.index)
+
+    residual['Split'] = 'test'
+    residual_total = pd.concat([residual_total, residual])
+    residual_total = residual_total.sort_values(by='file')
+    residual_total.to_csv('Residual_total_' + options.output +'.csv')
+
+
     residual['Cluster'] = data.loc[residual.index]['Cluster']
     nn_test_r2_scores = residual.groupby('Cluster').apply(lambda row:
                                                   r2_score(row['Observed'], row['Predicted']))
@@ -190,7 +199,7 @@ def main():
 
         r2_org_scores_table = pd.concat([nn_org_r2_scores_train, nn_org_r2_scores_test,
                                      cgcnn_org_r2_scores_train, cgcnn_org_r2_scores_train], axis=1)
-        r2_org_scores_table.columns = ['HFS NN test', 'HFS NN train', 'CGCNN test', 'CGCNN train']
+        r2_org_scores_table.columns = ['HFS NN train', 'HFS NN test', 'CGCNN train', 'CGCNN test']
         fig, ax = plt.subplots(figsize=[8.65, 7.28])
         sns.heatmap(r2_org_scores_table, annot=True, ax=ax)
         ax.set_title('Formation Energy')
