@@ -10,7 +10,7 @@ import seaborn as sns
 sns.set_context('talk')
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--output", default='relative_energy1', help='Output Parameter')
+parser.add_argument("--output", default='HSE_bandgap', help='Output Parameter')
 
 options = parser.parse_args()
 
