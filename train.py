@@ -10,7 +10,7 @@ parser.add_argument("--output", default='relative energy1', help='Output Paramet
 parser.add_argument("--n_att_layer", default=1, help='Number of Attention Layer')
 parser.add_argument("--n_fc", default=1, help='Number of fc Layers')
 parser.add_argument("--n_iter", default=100, help='Number of Iterations')
-parser.add_argument("--train_ratio", default=0.75, help='Train Ratio')
+parser.add_argument("--train_ratio", default=0.75, type=float, help='Train Ratio')
 parser.add_argument("--optimizer", default='Adam', help='Optimizer')
 parser.add_argument("--loss", default='mse', help='Loss function')
 
