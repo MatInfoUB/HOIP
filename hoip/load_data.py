@@ -23,7 +23,7 @@ def load_data(options, return_data=False):
     # Train test split
     ind_train, ind_test = train_test_split(range(len(data)), random_state=42, train_size=options.train_ratio)
     X_train, X_test = X[ind_train], X[ind_test]
-    ind_train, ind_test = train_test_split(data['file'].tolist(), random_state=42)
+    ind_train, ind_test = train_test_split(data['file'].tolist(), random_state=42, train_size=options.train_ratio)
     y_train, y_test, one_hots_train, one_hots_test= y[ind_train], y[ind_test], one_hots.loc[ind_train], one_hots.loc[ind_test]
 
     if return_data:
