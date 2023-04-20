@@ -16,7 +16,6 @@ parser.add_argument("--loss", default='mse', help='Loss function')
 
 options = parser.parse_args()
 
-
 def main():
 
     X_train, X_test, one_hots_train, \
@@ -37,6 +36,7 @@ def main():
     filename = 'regression_' + today + '_' + options.output + '.h5'
     filename = os.path.join(result_dir, filename)
     model.nn.save(filename)
+
 
 if __name__ == '__main__':
     main()
